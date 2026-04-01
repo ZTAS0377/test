@@ -2,7 +2,7 @@ name: Daily Commit Report (Testing)
 
 on:
   schedule:
-    - cron: "*/5 * * * *"   # every 5 minutes (for testing)
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -17,6 +17,13 @@ jobs:
         run: |
           echo "Developer,Repository,Branch,Commit Message" > report.csv
           git log --since="midnight" --pretty=format:'%an,%D,%s' >> report.csv
+          echo "===== FILE CONTENT ====="
+          cat report.csv
+
+      - name: Verify File Exists
+        run: |
+          ls -l
+          file report.csv
 
       - name: Send Email with Report
         uses: dawidd6/action-send-mail@v3
@@ -28,17 +35,13 @@ jobs:
           subject: "📊 Commit Report (Testing) - ${{ github.repository }}"
           to: ${{ secrets.TO_EMAIL }}
           from: GitHub Actions <${{ secrets.SMTP_USERNAME }}>
-          attachments: report.csv
+          attachments: ./report.csv   # ✅ FIXED PATH
           body: |
             Hello,
 
-            This is a TEST commit report (runs every 5 minutes).
+            This is a TEST commit report.
 
             📦 Repository: ${{ github.repository }}
-            📅 Today's Commits Included
             ⏱ Generated At: $(date)
 
             Please find the attached CSV report.
-
-            Regards,
-            GitHub Actions
