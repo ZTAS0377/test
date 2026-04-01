@@ -1,0 +1,27 @@
+name: Send Email on Commit
+
+on:
+  push:
+
+jobs:
+  send-email:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "New Commit Alert"
+
+          to: ${{ secrets.TO_EMAIL }}
+          from: GitHub Actions <${{ secrets.SMTP_USERNAME }}>
+
+          body: |
+            Developer: ${{ github.actor }}
+            Repo: ${{ github.repository }}
+            Branch: ${{ github.ref_name }}
+            Commit: ${{ github.event.head_commit.message }}
